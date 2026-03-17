@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BookStore
+namespace BookStore.Auth
 {
     public class Validator
     {
@@ -12,7 +12,7 @@ namespace BookStore
         {
             while (true)
             {
-                Console.WriteLine(text);
+                Console.Write(text);
                 string? data = Console.ReadLine();
                 if (data != null && validator.Invoke(data))
                 {
@@ -25,7 +25,7 @@ namespace BookStore
         {
             while (true)
             {
-                Console.WriteLine(text);
+                Console.Write(text);
                 if (DateOnly.TryParse(Console.ReadLine(), out DateOnly date))
                 {
                     return date;

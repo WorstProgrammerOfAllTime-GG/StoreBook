@@ -1,4 +1,5 @@
 ﻿using BookStore.Models;
+using BookStore.Serialize;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,50 +11,38 @@ namespace BookStore.Services
 {
     public class Store
     {
+        private const string IdPath = "id.json";
+        private const string UsersPath = "users.json";
         public List<Book> Books { get; set; } = new List<Book>();
         public List<User> Users { get; set; } = new List<User>();
         public List<Order> Orders { get; set; } = new List<Order>();
 
         private int lastID;
-        private int startID;
-        private User ? user;
+        readonly IStorage storage;
 
-        public Store()
+        public Store(IStorage storage)
         {
-            Task<int> task = DeSerializeID();
-            if (task.Result == 0) startID = task.Result;
-            else lastID = task.Result;
+           this.storage = storage;
+        }
+
+        public async Task Initialize()
+        {
+            lastID = await storage.LoadAsync<int?>(IdPath) ?? 0;
+            Users = await  storage.LoadAsync<List<User>>(UsersPath) ?? new List<User>();
         }
         public async Task CreateUser(string firstname, string secondname, 
             string patronymic, DateOnly datebirth,string email, string phonenumber,
             string password)
         {
             int id = CreateID();
-            user = new User(id,firstname,secondname,patronymic,datebirth,email,
+            var user = new User(id,firstname,secondname,patronymic,datebirth,email,
                 phonenumber,password);
             Users.Add(user);
-           await SerializeID(lastID);                     
+           await storage.SaveAsync<int>(IdPath,lastID);
+           await storage.SaveAsync<List<User>>(UsersPath, Users);
         }
-
-        public async Task SerializeID(int id)
-        {
-            using(FileStream fs = new FileStream("id.json", FileMode.Create))
-            {
-                await JsonSerializer.SerializeAsync<int>(fs, id);
-            }
-        }
-
-        public async Task<int> DeSerializeID()
-        {
-            using (FileStream fs = new FileStream("id.json", FileMode.OpenOrCreate))
-            {
-                if (fs.Length == 0)
-                    return 0;
-                return await JsonSerializer.DeserializeAsync<int>(fs);
-            }
-        }
-
-        public int CreateID()
+       
+        private int CreateID()
         {
            return ++lastID;
         }
