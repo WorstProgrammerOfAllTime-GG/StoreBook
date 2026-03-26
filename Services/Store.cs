@@ -41,7 +41,18 @@ namespace BookStore.Services
            await storage.SaveAsync<int>(IdPath,lastID);
            await storage.SaveAsync<List<User>>(UsersPath, Users);
         }
-       
+        
+        public bool isExsist(string data, Func<User,string> propertySelector)
+        {
+            return Users.Any(u=>propertySelector(u) == data);           
+        }
+
+        public User? AuthVerification(string login, string password)
+        {
+           return Users.FirstOrDefault(u => (u.Email == login || u.PhoneNumber == login) &&
+           u.Password == password);         
+        }
+    
         private int CreateID()
         {
            return ++lastID;

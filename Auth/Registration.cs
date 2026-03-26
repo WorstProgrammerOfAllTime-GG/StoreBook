@@ -23,19 +23,21 @@ namespace BookStore.Auth
         }
         public async Task RegistrationUser()
         {
+            Console.Clear();
             DateOnly datebirth;
             while (true)
             {
-                datebirth = validator.DateValidation("Введите дату рождения : ");
+
+                datebirth = validator.DateRegValidation("Введите дату рождения : ");                              
                 if (userAge.IsAllowedAge(datebirth)) break;
                 else Console.WriteLine("Указаный возраст не проходит регистрацию!");
             }
-            string? firstName = validator.Validation("Введите имя :", p => !string.IsNullOrWhiteSpace(p));
-            string? secondName = validator.Validation("Введите фамилию :", p => !string.IsNullOrEmpty(p));
-            string? patronymic = validator.Validation("Введите отчество :", p => !string.IsNullOrEmpty(p));
-            string? email = validator.Validation("Введите Email :", p => Regex.IsMatch(p, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"));
-            string? phoneNumber = validator.Validation("Введите номер телефона :", p => Regex.IsMatch(p, @"^\+?\d{10,15}$"));
-            string? password = validator.Validation("Введите пароль :", p=> p.Length <= 25 && p.Length>=8);
+            string? firstName = validator.ValidationReg("Введите имя : ", p => !string.IsNullOrWhiteSpace(p));
+            string? secondName = validator.ValidationReg("Введите фамилию : ", p => !string.IsNullOrWhiteSpace(p));
+            string? patronymic = validator.ValidationReg("Введите отчество : ", p => !string.IsNullOrWhiteSpace(p));
+            string? email = validator.ValidationReg("Введите Email : ", p=> !validator.RegEmailExists(p) && Regex.IsMatch(p, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"));
+            string? phoneNumber = validator.ValidationReg("Введите номер телефона : ", p=> !validator.RegPhoneExists(p) && Regex.IsMatch(p, @"^\+?\d{10,15}$"));
+            string? password = validator.ValidationReg("Введите пароль : ", p=> p.Length <= 25 && p.Length>=8 && !string.IsNullOrWhiteSpace(p));
             await store.CreateUser(firstName,secondName,patronymic, datebirth, email,phoneNumber,password);
         }
     }

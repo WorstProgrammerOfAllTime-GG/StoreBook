@@ -17,7 +17,7 @@ namespace BookStore.Models
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Password { get; set; }
-        List<Role> Roles { get; set; } = new List<Role>();
+        public List<Role> Roles { get; set; } = new List<Role>();
 
         public User(int id,string firstname,string secondname,
             string patronymic,DateOnly dateBirth, string email,
